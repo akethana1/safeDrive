@@ -99,3 +99,5 @@ def sleep():
       print(distancelist)
       print(durationlist)
       print(html_instructions_list)
+if __name__ == "__main__":
+  app.run()    
