@@ -1,4 +1,13 @@
 {% extends "index.html" %}
 {% block content %}
-    {{strike}}
+<center>
+
+    <br><br><br><br><br><br><br><br><br><h1>PLEASE PULL OVER TO THE REST STOP!!!!</h1>
+    <br><br><br><br><br><br><br><br>Directions:{{ instructions }}<br><br><br><br><br><br><br>
+     Start:{{start}}<br><br><br>
+     End: {{end}}<br><br><br>
+     ETA: {{time}}<br><br><br><br>
+    Google Maps Link:<a href="{{url}}">{{url}}</a>
+</center>
+
 {% endblock %}
