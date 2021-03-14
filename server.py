@@ -21,6 +21,8 @@ import dlib
 import cv2
 import os
 import winsound
+from bs4 import BeautifulSoup
+
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -134,6 +136,9 @@ def async_model():
     thr.start()
     return thr
 
+
+
+
 def get_instructions():
     g = geocoder.ip('me')
     print(g.latlng)
@@ -143,7 +148,6 @@ def get_instructions():
     longi = str(g.latlng[1])
     url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + longi + "&radius=5000&keyword=reststop&key=" + key
     response = requests.get(url).json()
-    html_googlemaplink = response['results'][0]['photos'][0]['html_attributions'][0]
 
     address = [response['results'][0]['geometry']['location']['lat'],
                response['results'][0]['geometry']['location']['lng']]
@@ -169,7 +173,23 @@ def get_instructions():
         html_instructions_list.append(i['html_instructions'])
     print(distancelist)
     print(durationlist)
-    print(html_instructions_list)
+    directions = ""
+    html_instructions =''
+    for i in range(len(html_instructions_list)):
+        html_str = html_instructions_list[i]
+        soup = BeautifulSoup(html_str)
+        html_instructions_list[i] = soup.get_text()
+        directions += soup.get_text() + "\n"
+        html_instructions += html_instructions_list[i]
+    print(directions)
+    url = "https://www.google.com/maps/dir/?api=1&origin="+str(lat)+","+str(longi)+"1&destination="+str(address[0])+","+str(address[1])
+
+    return directions, start_address, end_address, duration, url
+
+def async_model1():
+    thr = Thread(target=get_instructions)
+    thr.start()
+    return thr
 
 def alarm():
     global alarm_status
@@ -223,8 +243,9 @@ def home():
 
 @app.route('/sleep', methods=['GET', 'POST'])
 def sleep():
-    async_model()
-    return render_template('sleep.html', strike=strike)
+    model_func()
+    instructions, start, end, time, url = get_instructions()
+    return render_template('sleep.html', instructions=instructions, start=start, end=end, time=time, url=url)
 
 
 
